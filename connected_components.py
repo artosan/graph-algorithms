@@ -1,4 +1,5 @@
 import itertools
+import copy
 
 
 class ConnectedComponents(object):
@@ -28,13 +29,13 @@ class ConnectedComponents(object):
                     self.edges[e[1]].append(e[0])
 
         self.vertices = set(v for v in itertools.chain(*edges))
-        print("Graph preprocessing done!")
 
     def _find_scc(self):
         identified = set()
         stack = []
         index = {}
         boundaries = []
+        result = list()
 
         for v in self.vertices:
             if v not in index:
@@ -62,12 +63,16 @@ class ConnectedComponents(object):
                             scc = set(stack[index[v]:])
                             del stack[index[v]:]
                             identified.update(scc)
-                            yield scc
+                            if len(scc) > len(result):
+                                result = scc
 
-    def _find_wcc(self, start, path=[]):
+        return list(result)
+
+    def _find_wcc(self, start):
         """
         Iterative function which performs depth first search
         """
+        path = []
         graph = self.edges
         q = [start]
         while q:
@@ -81,6 +86,13 @@ class ConnectedComponents(object):
                     pass
         return path
 
+    def _find_one_wcc(self, v, vertices):
+        wcc = self._find_wcc(v)
+        remaining_vertices = copy.deepcopy(vertices)
+        remaining_vertices = remaining_vertices - set(wcc)
+        return (wcc, remaining_vertices)
+
+
     def find_largest_scc(self):
         return self._find_scc()
 
@@ -89,16 +101,18 @@ class ConnectedComponents(object):
         """
         Finds largest strongly connected component of the graph.
         """
-        checked_vertices = set()
-        largest_wcc = list()
-        for vertex in self.vertices:
-            # if vertex is not already in one of the scc's go for it!
-            if vertex not in checked_vertices:
-                wcc = self._find_wcc(vertex)
-                if len(wcc) > len(largest_wcc):
-                    largest_wcc = wcc
-                for v in wcc:
-                    checked_vertices.add(v)
-            else:
-                next
-        return largest_wcc
+        v = self.vertices.pop()
+        self.vertices.add(v)
+        wcc, remaining_vertices = self._find_one_wcc(v, self.vertices)
+
+        while True:
+            try:
+                v = remaining_vertices.pop()
+                remaining_vertices.add(v)
+            except Exception as err:
+                break
+            w, remaining_vertices = self._find_one_wcc(v, remaining_vertices)
+            if len(w) > len(wcc):
+                wcc = w
+
+        return wcc
