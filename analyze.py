@@ -5,7 +5,7 @@ import time
 
 if __name__ == "__main__":
 
-    filenames = ['data/wiki-Vote.txt']
+    filenames = ['data/wiki-Vote.txt', 'data/soc-Epinions1.txt']
     print("Starting graph analysis...")
     start_time = time.time()
     for file in filenames:
@@ -16,17 +16,24 @@ if __name__ == "__main__":
             edges = [tuple(map(long, i.split())) for i in f]
 
         wcc = ConnectedComponents(edges, False)
-        largest_wcc = wcc.find_largest_wcc()
+        wcc_edges, largest_wcc = wcc.find_largest_wcc()
         pickle.dump(largest_wcc, open(file + ".wcc.p", "wb"))
         wcc_size = len(list(largest_wcc))
 
         scc = ConnectedComponents(edges, True)
-        largest_scc = scc.find_largest_scc()
+        scc_edges, largest_scc = scc.find_largest_scc()
         pickle.dump(largest_scc, open(file + ".scc.p", "wb"))
         scc_size = len(largest_scc)
 
-        print("Node count of the largest weakly connected component in graph {} is: {}".format(file, wcc_size))
-        print("Node count of the lergest strongly connected component in graph {} is: {}".format(file, scc_size))
+        print(
+            "Statistics of the largest weakly connected component in graph {}".format(file))
+        print("Node count: {}".format(wcc_size))
+        print("Edge count: {}".format(wcc_edges))
+
+        print("----------")
+        print("Statistics of the largest strongly connected component in graph {}".format(file))
+        print("Node count: {}".format(scc_size))
+        print("Edge count: {}".format(scc_edges))
 
         end = time.time()
         timedelta = end - start

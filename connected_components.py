@@ -36,7 +36,7 @@ class ConnectedComponents(object):
         index = {}
         boundaries = []
         result = list()
-
+        edgecount = 0
         for v in self.vertices:
             if v not in index:
                 to_do = [('V', v)]
@@ -66,7 +66,14 @@ class ConnectedComponents(object):
                             if len(scc) > len(result):
                                 result = scc
 
-        return list(result)
+        result = list(result)
+        for v in result:
+            edges = self.edges[v]
+            for e in edges:
+                if e in result:
+                    edgecount += 1
+
+        return (edgecount, result)
 
     def _find_wcc(self, start):
         """
@@ -75,6 +82,7 @@ class ConnectedComponents(object):
         path = []
         graph = self.edges
         q = [start]
+        edgecount = 0
         while q:
             v = q.pop()
             if v not in path:
@@ -84,18 +92,22 @@ class ConnectedComponents(object):
                 except Exception as err:
                     # if key does not exist we can just ignore the exception
                     pass
-        return path
+
+        # count edges
+        for v in path:
+            edgecount = edgecount + len(graph[v])
+        # division by two since we have undirected graph
+        # i.e. same edge is twice in graph
+        return (edgecount / 2, path)
 
     def _find_one_wcc(self, v, vertices):
-        wcc = self._find_wcc(v)
+        edgecount, wcc = self._find_wcc(v)
         remaining_vertices = copy.deepcopy(vertices)
         remaining_vertices = remaining_vertices - set(wcc)
-        return (wcc, remaining_vertices)
-
+        return (edgecount, wcc, remaining_vertices)
 
     def find_largest_scc(self):
         return self._find_scc()
-
 
     def find_largest_wcc(self):
         """
@@ -103,7 +115,8 @@ class ConnectedComponents(object):
         """
         v = self.vertices.pop()
         self.vertices.add(v)
-        wcc, remaining_vertices = self._find_one_wcc(v, self.vertices)
+        curr_edgecount, wcc, remaining_vertices = self._find_one_wcc(
+            v, self.vertices)
 
         while True:
             try:
@@ -111,8 +124,10 @@ class ConnectedComponents(object):
                 remaining_vertices.add(v)
             except Exception as err:
                 break
-            w, remaining_vertices = self._find_one_wcc(v, remaining_vertices)
+            edgecount, w, remaining_vertices = self._find_one_wcc(
+                v, remaining_vertices)
             if len(w) > len(wcc):
                 wcc = w
+                curr_edgecount = edgecount
 
-        return wcc
+        return (curr_edgecount, wcc)
