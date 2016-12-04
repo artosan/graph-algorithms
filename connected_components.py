@@ -3,9 +3,16 @@ import copy
 
 
 class ConnectedComponents(object):
-
+    """
+    This class implements connected components calculations on graph
+    it provides functions to get largest strongly connected component and
+    largest weakly connected component from the given graph
+    """
     def __init__(self, edges, directed):
-
+        """
+        Constructor to initialize tha graph structure which is different for
+        directed and non-directed graphs.
+        """
         self.edges = {}
         if directed:
             for e in edges:
@@ -31,6 +38,13 @@ class ConnectedComponents(object):
         self.vertices = set(v for v in itertools.chain(*edges))
 
     def _find_scc(self):
+        """
+        This function finds the largest strongly connected component from the graph,
+        it is an implementation of tarjans algorithm. 
+
+        This implementation is modified version from:
+        https://code.activestate.com/recipes/578507-strongly-connected-components-of-a-directed-graph/
+        """
         identified = set()
         stack = []
         index = {}
@@ -77,18 +91,19 @@ class ConnectedComponents(object):
 
     def _find_wcc(self, start):
         """
-        Iterative function which performs depth first search
+        Iterative function which performs depth first search and finds single
+        weakly connected component
         """
-        path = []
+        path = set()
         graph = self.edges
-        q = [start]
+        vertices = [start]
         edgecount = 0
-        while q:
-            v = q.pop()
+        while vertices:
+            v = vertices.pop()
             if v not in path:
-                path += [v]
+                path|= set([v])
                 try:
-                    q += graph[v]
+                    vertices += graph[v]
                 except Exception as err:
                     # if key does not exist we can just ignore the exception
                     pass
@@ -101,17 +116,26 @@ class ConnectedComponents(object):
         return (edgecount / 2, path)
 
     def _find_one_wcc(self, v, vertices):
+        """
+        Helper function which finds one wcc and returns it. 
+        Moreover we return set of vertices which we did not traverse yet.
+        """
         edgecount, wcc = self._find_wcc(v)
+        # is this deepcopy necessary?
         remaining_vertices = copy.deepcopy(vertices)
         remaining_vertices = remaining_vertices - set(wcc)
         return (edgecount, wcc, remaining_vertices)
 
     def find_largest_scc(self):
+        """
+        Wrapper function for find scc
+        """
         return self._find_scc()
 
     def find_largest_wcc(self):
         """
         Finds largest strongly connected component of the graph.
+        This id done by 
         """
         v = self.vertices.pop()
         self.vertices.add(v)
