@@ -93,7 +93,7 @@ if __name__ == "__main__":
         s = ExactStatistics(scc_nodes, edges, True)
         r = s.calculate_full_statistics()
 
-        pickle.dump(r, open(file + ".scc.p", "wb"))
+        pickle.dump(r, open(file + ".scc.statistics.p", "wb"))
 
 
         end = time.time()
