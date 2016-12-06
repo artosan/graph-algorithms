@@ -5,7 +5,7 @@ import time
 
 if __name__ == "__main__":
 
-    filenames = ['data/wiki-Vote.txt', 'data/soc-Epinions1.txt']
+    filenames = ['data/gplus_combined.txt']
     print("Starting graph analysis...")
     start_time = time.time()
     for file in filenames:
