@@ -4,9 +4,9 @@ import sys
 from itertools import islice
 import time
 
-class ExactStatistics(object):
+class ExactStatisticsFW(object):
     """
-    This class calculates exact statistics from the given graph by using Dijkstra's shortest path algorithm.
+    This class calculates exact statistics from the given graph by using Floyd–Warshall algorithm.
     """
     def __init__(self, nodes, full_set_of_edges, directed):
         """
@@ -38,6 +38,10 @@ class ExactStatistics(object):
         #print(len(self.g.keys()))
         
         print("Graph built with {} edges and {} nodes.".format(len(edges),len(nodes)))
+        
+        #return self.fw(self.g)
+
+    def calculate(self):
         print("Starting to find cost between all pairs of vertices...")
         return self.fw(self.g)
 
@@ -81,7 +85,7 @@ class ExactStatistics(object):
         total_iters = len(vertices)
         print(total_iters)
         for k in vertices:
-            if count % 10 == 0:
+            if count % 20 == 0:
                 sys.stdout.write(" " + str(count/float(total_iters)) + " ")
                 sys.stdout.flush()
             for i in vertices:
@@ -110,14 +114,14 @@ if __name__ == "__main__":
         with open(file) as f:
             edges = [tuple(map(long, i.split())) for i in f]
 
-        r = ExactStatistics(wcc_nodes, edges, False)
-
-        pickle.dump(r, open(file + ".wcc.statistics.p", "wb"))
+        r = ExactStatisticsFW(wcc_nodes, edges, False)
+        res = r.calculate()
+        pickle.dump(res, open(file + ".wcc.statistics.p", "wb"))
 
         print("WCC done!")
-        r = ExactStatistics(scc_nodes, edges, True)
-
-        pickle.dump(r, open(file + ".scc.statistics.p", "wb"))
+        r = ExactStatisticsFW(scc_nodes, edges, True)
+        res = r.calculate()
+        pickle.dump(res, open(file + ".scc.statistics.p", "wb"))
 
 
         end = time.time()
