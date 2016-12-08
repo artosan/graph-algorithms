@@ -6,7 +6,7 @@ import time
 
 class ExactStatisticsFW(object):
     """
-    This class calculates exact statistics from the given graph by using Floyd–Warshall algorithm.
+    This class calculates exact statistics by Floyd-Warshall algorithm.
     """
     def __init__(self, nodes, full_set_of_edges, directed):
         """
