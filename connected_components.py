@@ -8,6 +8,7 @@ class ConnectedComponents(object):
     it provides functions to get largest strongly connected component and
     largest weakly connected component from the given graph
     """
+
     def __init__(self, edges, directed):
         """
         Constructor to initialize tha graph structure which is different for
@@ -40,7 +41,7 @@ class ConnectedComponents(object):
     def _find_scc(self):
         """
         This function finds the largest strongly connected component from the graph,
-        it is an implementation of tarjans algorithm. 
+        it is an implementation of tarjans algorithm.
 
         This implementation is modified version from:
         https://code.activestate.com/recipes/578507-strongly-connected-components-of-a-directed-graph/
@@ -101,7 +102,7 @@ class ConnectedComponents(object):
         while vertices:
             v = vertices.pop()
             if v not in path:
-                path|= set([v])
+                path |= set([v])
                 try:
                     vertices += graph[v]
                 except Exception as err:
@@ -117,7 +118,7 @@ class ConnectedComponents(object):
 
     def _find_one_wcc(self, v, vertices):
         """
-        Helper function which finds one wcc and returns it. 
+        Helper function which finds one wcc and returns it.
         Moreover we return set of vertices which we did not traverse yet.
         """
         edgecount, wcc = self._find_wcc(v)
@@ -135,7 +136,8 @@ class ConnectedComponents(object):
     def find_largest_wcc(self):
         """
         Finds largest strongly connected component of the graph.
-        This id done by 
+        This id done by calling dfs constantly untill we get all
+        weakyl connected components. The largest of those is then returned.
         """
         v = self.vertices.pop()
         self.vertices.add(v)
