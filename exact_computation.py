@@ -3,20 +3,7 @@ import pickle
 import sys
 from itertools import islice
 import time
-
-
-def prune_graph(nodes, edges):
-    """
-    Removes the unnecessary parts of the full graph i.e. when nodes of the scc
-    are given it removes all edges that are not part of it
-    """
-    pruned_edges = list()
-    check_nodes = set(nodes)
-    for e in edges:
-        if e[0] in check_nodes and e[1] in check_nodes:
-            pruned_edges.append(e)
-
-    return pruned_edges
+from helpers import mean, percentile, prune_graph
 
 
 class ShortestPathsDjikstra(object):
@@ -151,14 +138,14 @@ def calculate_all_paths():
         print("Starting to work with graph {}".format(file))
         start = time.time()
 
-        #wcc_nodes = pickle.load(open(file + ".wcc.p", "rb"))
+        wcc_nodes = pickle.load(open(file + ".wcc.p", "rb"))
         scc_nodes = pickle.load(open(file + ".scc.p", "rb"))
         with open(file) as f:
             edges = [tuple(map(long, i.split())) for i in f]
 
-        #r = ShortestPathsFW(wcc_nodes, edges, False)
-        #res = r.calculate()
-        #pickle.dump(res, open(file + ".wcc.statistics.p", "wb"))
+        r = ShortestPathsFW(wcc_nodes, edges, False)
+        res = r.calculate()
+        pickle.dump(res, open(file + ".wcc.statistics.p", "wb"))
 
         r = ShortestPathsFW(scc_nodes, edges, True)
         res = r.calculate()
@@ -188,17 +175,17 @@ def calculate_statistics(distances):
                 inf_count = inf_count + 1
             values.append(distances[row][col])
 
+    # sanity check that we do not have any unconnected nodes!
     print(inf_count)
+    assert inf_count == 0
     values = sorted(values)
+    d_median = percentile(values, 0.5)
+    d_mean = mean(values)
+    d_diameter = max(values)
+    d_effective_diameter = percentile(values, 0.9)
 
+    return (d_median, d_mean, d_diameter, d_effective_diameter)
 
     end = time.time()
     timedelta = end - start_time
     print("Calculating statistics took {} seconds".format(timedelta))
-
-if __name__ == "__main__":
-    calculate_all_paths()
-    #wcc_distances = pickle.load(open("data/wiki-Vote.txt.wcc.statistics.p", "rb"))
-    scc_distances = pickle.load(open("data/wiki-Vote.txt.scc.statistics.p", "rb"))
-    #print(size(wcc_distances))
-    calculate_statistics(scc_distances)
