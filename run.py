@@ -72,7 +72,7 @@ def exact_stats(filename):
 def run_stats(filenames):
 
     # exact stats only for wiki-Vote.txt
-    exact_stats("data/wiki-Vote.txt")
+    # exact_stats("data/wiki-Vote.txt")
 
     # Loop to approximate the stats of the graphs
     print("APPROXIMATE STATISTICS")
@@ -90,14 +90,14 @@ def run_stats(filenames):
 
         sampler = RandomPairs(scc_nodes, edges, True)
         random_pairs_stats_scc = list()
-        iterations = [1000]
+        iterations = [2]
         for iter in iterations:
             print("Approximating by randomly choosing {} pairs.".format(iter))
             random_pairs_stats_scc.append(
                 {'iter': iter, 'stats': sampler.approximate(iter)})
 
         bfs_sampler = RandomBFS(scc_nodes, edges, True)
-        iterations = [50]
+        iterations = [1]
         random_bfs_stats_scc = list()
         for iter in iterations:
             print("Approximating by randomly starting BFS {} times.".format(iter))
@@ -106,14 +106,14 @@ def run_stats(filenames):
 
         sampler = RandomPairs(wcc_nodes, edges, False)
         random_pairs_stats_wcc = list()
-        iterations = [1000]
+        iterations = [2]
         for iter in iterations:
             print("Approximating by randomly choosing {} pairs.".format(iter))
             random_pairs_stats_wcc.append(
                 {'iter': iter, 'stats': sampler.approximate(iter)})
 
         bfs_sampler = RandomBFS(wcc_nodes, edges, False)
-        iterations = [50]
+        iterations = [1]
         random_bfs_stats_wcc = list()
         for iter in iterations:
             print("Approximating by randomly starting BFS {} times.".format(iter))
@@ -169,16 +169,15 @@ if __name__ == "__main__":
 
     # generate wcc and scc for every graph, prepare for a long wait if you run
     # this
-    generate_connected_components()
+    #generate_connected_components()
 
     """
 
     """
-    calculate_all_paths()
+    #calculate_all_paths()
 
     """
     Run exact and approximated statistics for the given graph
     """
-    files = ['data/wiki-Vote.txt',
-             'data/soc-Epinions1.txt', 'data/gplus_combined.txt']
+    files = ['data/gplus_combined.txt']
     run_stats(files)

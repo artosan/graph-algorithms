@@ -7,13 +7,14 @@ from bitstring import BitArray
 from math import floor, log, pow
 from random import random, choice, sample
 from bisect import bisect
+from collections import deque
+
 
 
 class ANF0(object):
     """
     This class implements anf0 algorithm to approximate graph stats
     """
-
     def weighted_choice(self, choices):
         """
         This function returns weighted choices, for instance:
@@ -32,6 +33,7 @@ class ANF0(object):
         x = random() * total
         i = bisect(cum_weights, x)
         return values[i]
+
 
     def build_bitmask(self, bits):
         """
@@ -53,12 +55,14 @@ class ANF0(object):
         assert bs.count(True) == 1
         return bs
 
+
     def try_get(self, val, bits):
         try:
             v = val[0]
         except Exception as e:
             v = bits
         return v
+
 
     def anf0(self, edges, X, distances, k):
         """
@@ -203,19 +207,23 @@ class RandomBFS(object):
     def _bfs(self, start):
         '''iterative breadth first search from start'''
         dist = {}
-        q = [start]
+        q = deque()#[start]
+        q.append(start)
         dist[start] = 0
         path = list()
         while q:
-            v = q.pop(0)
+            v = q.popleft()
+            if len(q) % 100 == 0:
+                print(len(q))
             if v not in path:
                 path = path + [v]
-                q = q + self.graph[v]
+                q.extendleft(self.graph[v])
                 for ve in self.graph[v]:
                     if ve not in dist:
                         dist[ve] = dist[v] + 1
 
         return (path, dist)
+
 
     def approximate(self, iter):
         """
@@ -224,8 +232,8 @@ class RandomBFS(object):
         """
         start_time = time.time()
         values = list()
-        for i in range(1, iter):
-            if i % 100 == 0:
+        for i in range(0, iter):
+            if i % 1 == 0:
                 sys.stdout.write(" " + str(i / float(iter)) + " ")
                 sys.stdout.flush()
             a = sample(self.nodes, 1)
